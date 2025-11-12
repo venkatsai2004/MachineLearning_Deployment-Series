@@ -51,12 +51,10 @@ with mlflow.start_run():
     result=mlflow.register_model(model_uri,"LoanApprovalModel")
     print(f"Model Registered with ID at {result.version}")
     
-from mlflow.tracking.client import MlflowClient
-client=MlflowClient()
-model_name="LoanApprovalModel"
-latest_version=client.get_latest_versions(model_name,stages=["None"])[0].version
+from mlflow.tracking import MlflowClient
+client = MlflowClient()
 client.transition_model_version_stage(
-    name=model_name,
-    version=latest_version,
+    name="LoanApprovalModel",
+    version=4, 
     stage="Production"
 )
