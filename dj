@@ -1,0 +1,312 @@
+[33mcommit efda6e85c2f65add6c877d8d81f22c2e7a0b4a0d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: venkat <venkatsai1072@gmail.com>
+Date:   Wed Nov 12 14:39:50 2025 +0530
+
+    "Created a streamlit on the loan Aprroval"
+
+[1mdiff --git a/RandomForest.joblib b/RandomForest.joblib[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ad6944b[m
+Binary files /dev/null and b/RandomForest.joblib differ
+[1mdiff --git a/loan-approval-dataset.zip b/loan-approval-dataset.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9c61d51[m
+Binary files /dev/null and b/loan-approval-dataset.zip differ
+[1mdiff --git a/loan-approval-streamlit/README.md b/loan-approval-streamlit/README.md[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6474bf7[m
+[1m--- /dev/null[m
+[1m+++ b/loan-approval-streamlit/README.md[m
+[36m@@ -0,0 +1,54 @@[m
+[32m+[m[32m# Loan Approval Prediction Streamlit Application[m
+[32m+[m
+[32m+[m[32mThis project is a Streamlit application for predicting loan approvals based on various features. The application utilizes a machine learning model trained on a dataset of loan applications.[m[41m [m
+[32m+[m
+[32m+[m[32m## Project Structure[m
+[32m+[m
+[32m+[m[32m- **app.py**: Main entry point for the Streamlit application. It loads the model, processes user inputs, and displays predictions and visualizations.[m
+[32m+[m[32m- **requirements.txt**: Lists the dependencies required for the project, including Streamlit, pandas, numpy, scikit-learn, and other necessary libraries.[m
+[32m+[m[32m- **.gitignore**: Specifies files and directories to be ignored by Git, such as compiled Python files and virtual environments.[m
+[32m+[m[32m- **data/loan_approval.csv**: Dataset used for the loan approval analysis and model training.[m
+[32m+[m[32m- **notebooks/eda4.ipynb**: Jupyter Notebook containing exploratory data analysis and modeling code that serves as the basis for the Streamlit application.[m
+[32m+[m[32m- **src/**: Contains various Python modules for data processing, feature engineering, visualization, model training, and prediction.[m
+[32m+[m[32m  - **data_processing.py**: Functions for data cleaning and preprocessing.[m
+[32m+[m[32m  - **features.py**: Functions for feature engineering.[m
+[32m+[m[32m  - **visualization.py**: Functions for visualizing data and model results.[m
+[32m+[m[32m  - **models.py**: Model training and evaluation functions.[m
+[32m+[m[32m  - **predict.py**: Functions for making predictions using the trained model.[m
+[32m+[m[32m  - **utils.py**: Utility functions for use across different modules.[m
+[32m+[m[32m- **models/loan_model.joblib**: Serialized trained model ready for predictions.[m
+[32m+[m[32m- **tests/**: Contains unit tests for the project.[m
+[32m+[m[32m  - **test_data_processing.py**: Unit tests for data processing functions.[m
+[32m+[m[32m  - **test_models.py**: Unit tests for model training and prediction functions.[m
+[32m+[m
+[32m+[m[32m## Installation[m
+[32m+[m
+[32m+[m[32m1. Clone the repository:[m
+[32m+[m[32m   ```[m
+[32m+[m[32m   git clone <repository-url>[m
+[32m+[m[32m   cd loan-approval-streamlit[m
+[32m+[m[32m   ```[m
+[32m+[m
+[32m+[m[32m2. Install the required packages:[m
+[32m+[m[32m   ```[m
+[32m+[m[32m   pip install -r requirements.txt[m
+[32m+[m[32m   ```[m
+[32m+[m
+[32m+[m[32m## Running the Application[m
+[32m+[m
+[32m+[m[32mTo run the Streamlit application, execute the following command in your terminal:[m
+[32m+[m[32m```[m
+[32m+[m[32mstreamlit run app.py[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mThis will start the Streamlit server and open the application in your web browser.[m
+[32m+[m
+[32m+[m[32m## Usage[m
+[32m+[m
+[32m+[m[32m- Input the required features in the provided fields.[m
+[32m+[m[32m- Click on the "Predict" button to see the loan approval prediction.[m
+[32m+[m[32m- Visualizations will be displayed based on the input data and model predictions.[m
+[32m+[m
+[32m+[m[32m## License[m
+[32m+[m
+[32m+[m[32mThis project is licensed under the MIT License.[m
+\ No newline at end of file[m
+[1mdiff --git a/loan-approval-streamlit/app.py b/loan-approval-streamlit/app.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c981a1e[m
+[1m--- /dev/null[m
+[1m+++ b/loan-approval-streamlit/app.py[m
+[36m@@ -0,0 +1,49 @@[m
+[32m+[m[32mimport streamlit as st[m
+[32m+[m[32mimport pandas as pd[m
+[32m+[m[32mimport numpy as np[m
+[32m+[m[32mfrom sklearn.model_selection import train_test_split[m
+[32m+[m[32mfrom sklearn.ensemble import RandomForestClassifier[m
+[32m+[m
+[32m+[m[32mst.title("Loan Approval Prediction")[m
+[32m+[m
+[32m+[m[32muploaded_file = st.file_uploader("Upload your CSV file", type="csv")[m
+[32m+[m[32mif uploaded_file:[m
+[32m+[m[32m    df = pd.read_csv(uploaded_file)[m
+[32m+[m[32m    st.write("## Raw Data Preview")[m
+[32m+[m[32m    st.dataframe(df.head(10))[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Training on just these features[m
+[32m+[m[32m    features = ["city", "loan_amount", "credit_score", "years_employed"][m
+[32m+[m[32m    # Encode city as index for simplicity (for production use LabelEncoder)[m
+[32m+[m[32m    df["city_encoded"] = df["city"].astype("category").cat.codes[m
+[32m+[m[32m    X = df[["city_encoded", "loan_amount", "credit_score", "years_employed"]][m
+[32m+[m[32m    y = df["loan_approved"][m
+[32m+[m[32m    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)[m
+[32m+[m
+[32m+[m[32m    model = RandomForestClassifier(random_state=42)[m
+[32m+[m[32m    model.fit(X_train, y_train)[m
+[32m+[m
+[32m+[m[32m    st.write("## Predict Loan Approval")[m
+[32m+[m[32m    # Manual entry form[m
+[32m+[m[32m    city_entry = st.text_input("City")[m
+[32m+[m[32m    loan_amount_entry = st.number_input("Loan Amount", min_value=0, value=10000)[m
+[32m+[m[32m    credit_score_entry = st.number_input("Credit Score", min_value=0, max_value=1000, value=500)[m
+[32m+[m[32m    years_employed_entry = st.number_input("Years Employed", min_value=0, value=1)[m
+[32m+[m
+[32m+[m[32m    # Encode entered city same as training encoding[m
+[32m+[m[32m    known_cities = list(df["city"].astype("category").cat.categories)[m
+[32m+[m[32m    if city_entry in known_cities:[m
+[32m+[m[32m        city_code = known_cities.index(city_entry)[m
+[32m+[m[32m    else:[m
+[32m+[m[32m        city_code = 0  # Default or show warning[m
+[32m+[m
+[32m+[m[32m    new_data = pd.DataFrame([{[m
+[32m+[m[32m        "city_encoded": city_code,[m
+[32m+[m[32m        "loan_amount": loan_amount_entry,[m
+[32m+[m[32m        "credit_score": credit_score_entry,[m
+[32m+[m[32m        "years_employed": years_employed_entry[m
+[32m+[m[32m    }])[m
+[32m+[m[41m    [m
+[32m+[m[32m    if st.button("Predict Loan Approval"):[m
+[32m+[m[32m        pred = model.predict(new_data)[0][m
+[32m+[m[32m        st.write(f"Prediction: {'Approved' if pred else 'Not Approved'}")[m
+[1mdiff --git a/loan-approval-streamlit/data/loan_approval.csv b/loan-approval-streamlit/data/loan_approval.csv[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1e746d4[m
+[1m--- /dev/null[m
+[1m+++ b/loan-approval-streamlit/data/loan_approval.csv[m
+[36m@@ -0,0 +1,2001 @@[m
+[32m+[m[32mname,city,income,credit_score,loan_amount,years_employed,points,loan_approved[m
+[32m+[m[32mAllison Hill,East Jill,113810,389,39698,27,50.0,False[m
+[32m+[m[32mBrandon Hall,New Jamesside,44592,729,15446,28,55.0,False[m
+[32m+[m[32mRhonda Smith,Lake Roberto,33278,584,11189,13,45.0,False[m
+[32m+[m[32mGabrielle Davis,West Melanieview,127196,344,48823,29,50.0,False[m
+[32m+[m[32mValerie Gray,Mariastad,66048,496,47174,4,25.0,False[m
+[32m+[m[32mDarren Roberts,Port Jesseville,62098,689,19217,29,65.0,True[m
+[32m+[m[32mHolly Wood,Lake Joseph,59256,373,40920,40,35.0,False[m
+[32m+[m[32mNicholas Martin,Nelsonside,48289,524,45866,20,25.0,False[m
+[32m+[m[32mPatty Perez,Port Leslieview,126530,367,14826,36,55.0,False[m
+[32m+[m[32mEmily Rios,Wilkersonmouth,43434,446,18359,8,20.0,False[m
+[32m+[m[32mJustin Baker,Hurstfurt,118696,670,15373,8,75.0,True[m
+[32m+[m[32mAnn Williams,East Courtneychester,127080,365,26216,24,55.0,False[m
+[32m+[m[32mJulie King,Lake Jenniferside,146939,573,43006,21,50.0,False[m
+[32m+[m[32mJeffrey Chavez,Teresaburgh,101482,819,7973,40,100.0,True[m
+[32m+[m[32mMark Lynch,West Kathryn,41395,843,1037,38,80.0,True[m
+[32m+[m[32mAlec Hickman,Johnbury,107397,380,6613,31,60.0,True[m
+[32m+[m[32mVanessa Patel,East Donna,85302,469,18370,33,50.0,False[m
+[32m+[m[32mJenny Lewis,Lake Larry,34165,682,29711,33,50.0,False[m
+[32m+[m[32mDavid Brown,New Angelashire,33905,525,1471,4,30.0,False[m
+[32m+[m[32mAmy Jones,Port Markhaven,42280,543,19250,31,25.0,False[m
+[32m+[m[32mCarlos Walls,Sanchezfort,58657,716,13478,6,65.0,True[m
+[32m+[m[32mJeffrey Henderson,Shieldston,60495,400,4972,25,50.0,False[m
+[32m+[m[32mRebecca Rodriguez,East Amanda,96237,443,28648,11,45.0,False[m
+[32m+[m[32mDavid Leblanc,Mortonside,108907,400,4315,34,60.0,True[m
+[32m+[m[32mTracy House,East Richard,33478,792,15008,25,60.0,True[m
+[32m+[m[32mCarmen Smith,Bakermouth,103563,592,28722,35,65.0,True[m
+[32m+[m[32mKatelyn Lee,North Beth,56062,362,21552,3,30.0,False[m
+[32m+[m[32mJohn Calhoun,North Susan,123850,382,13178,4,45.0,False[m
+[32m+[m[32mMegan Young,New Johnton,115181,383,28474,37,55.0,False[m
+[32m+[m[32mEmily Green,Johnfurt,121924,434,45019,19,50.0,False[m
+[32m+[m[32mTimothy Walls,South Christineshire,101426,402,5801,34,60.0,True[m
+[32m+[m[32mDerek Mahoney,East Mikeburgh,84987,748,36600,19,75.0,True[m
+[32m+[m[32mVictoria Valdez,Lake Lisaport,58893,406,9800,16,45.0,False[m
+[32m+[m[32mBrian Tran,Juanborough,88878,651,14342,40,65.0,True[m
+[32m+[m[32mKathy King,North Cynthiaview,107236,345,1232,21,60.0,True[m
+[32m+[m[32mMandy Green,Arnoldchester,66463,309,8331,4,35.0,False[m
+[32m+[m[32mMelissa Hernandez,Port Mikeside,136093,451,29166,8,50.0,False[m
+[32m+[m[32mJacob Fitzpatrick,West Jasonbury,143940,405,24178,35,55.0,False[m
+[32m+[m[32mJennifer Oliver,East Michelle,30851,481,28020,1,10.0,False[m
+[32m+[m[32mTim Patton,Phambury,129458,573,11433,6,55.0,False[m
+[32m+[m[32mAndrew Ruiz,Port Samantha,135620,658,21000,14,70.0,True[m
+[32m+[m[32mMatthew Ross,Michelleview,50926,659,43040,32,50.0,False[m
+[32m+[m[32mWilliam Herrera,North Natalieview,121506,482,39049,16,50.0,False[m
+[32m+[m[32mKyle Reed,Samuelhaven,85392,418,26244,36,45.0,False[m
+[32m+[m[32mAndrew Graham,West Ryan,74597,638,41839,20,50.0,False[m
+[32m+[m[32mBelinda Mccullough,Elizabethmouth,66421,712,46692,18,60.0,True[m
+[32m+[m[32mCheryl Ortega,Byrdburgh,50379,608,27612,35,50.0,False[m
+[32m+[m[32mElizabeth Clark,Stevenmouth,58221,518,34500,30,35.0,False[m
+[32m+[m[32mToni Fitzgerald,West Zacharymouth,130072,395,16392,19,55.0,False[m
+[32m+[m[32mCurtis Johnson,South Cheryl,74118,374,30846,26,35.0,False[m
+[32m+[m[32mLaura Higgins,Snyderbury,43396,451,43995,0,10.0,False[m
+[32m+[m[32mShannon Mcclure,Robinsonhaven,42156,775,4291,35,70.0,True[m
+[32m+[m[32mRyan Bryant,Contrerasside,79797,624,30004,39,60.0,True[m
+[32m+[m[32mStephanie Simmons,Merrittfort,42676,760,17986,15,60.0,True[m
+[32m+[m[32mDestiny Strickland,Simsview,77052,750,6077,18,90.0,True[m
+[32m+[m[32mGeorge Orozco,East Edwardfurt,141082,456,47295,13,50.0,False[m
+[32m+[m[32mJason Daniels,Brownchester,75082,698,39278,1,50.0,False[m
+[32m+[m[32mPamela James,West Kennethfurt,109131,729,36272,34,75.0,True[m
+[32m+[m[32mStephanie Freeman,Ryantown,64671,698,23028,25,65.0,True[m
+[32m+[m[32mSara Calhoun,South Brittanytown,135791,385,43123,27,50.0,False[m
+[32m+[m[32mJoel Williams,Murphymouth,35695,634,23118,24,40.0,False[m
+[32m+[m[32mTrevor Fisher,South Andrewside,125647,353,23935,14,55.0,False[m
+[32m+[m[32mRachael Pearson,East Jamestown,90217,456,16633,8,45.0,False[m
+[32m+[m[32mBrian Gould,Lyonsstad,100284,471,40707,38,45.0,False[m
+[32m+[m[32mMichelle Strickland,West Daniel,46361,326,21444,36,25.0,False[m
+[32m+[m[32mTina Sanders,North Brittany,79615,548,7678,19,55.0,False[m
+[32m+[m[32mLindsay Martinez,West Amandastad,40328,370,34158,21,25.0,False[m
+[32m+[m[32mJason Henry,Yumouth,102357,456,29540,11,50.0,False[m
+[32m+[m[32mTracie Nelson,Marshallshire,68427,574,22122,15,40.0,False[m
+[32m+[m[32mAngelica Keith,Port Steven,138711,688,23046,1,65.0,True[m
+[32m+[m[32mFrederick Freeman MD,Matthewview,112397,310,34857,12,50.0,False[m
+[32m+[m[32mNathan Freeman,Lake Thomas,111070,802,30371,1,75.0,True[m
+[32m+[m[32mDaniel Holt,Elizabethstad,146057,784,37272,33,85.0,True[m
+[32m+[m[32mZachary Pierce,Jacquelineview,142945,613,17475,14,70.0,True[m
+[32m+[m[32mCorey Wilson,East Javier,77400,795,19120,37,85.0,True[m
+[32m+[m[32mKelly Campbell,Port Jamesbury,105674,669,12759,19,70.0,True[m
+[32m+[m[32mJoseph Hill,New Kellyberg,55203,802,7723,0,70.0,True[m
+[32m+[m[32mJulie Alexander,North Johnny,122349,789,8476,4,85.0,True[m
+[32m+[m[32mBenjamin Soto,East Edwardshire,39116,611,6582,15,50.0,False[m
+[32m+[m[32mPhillip Obrien,Port Alexandra,36006,761,30014,19,60.0,True[m
+[32m+[m[32mWanda Torres,New Susanville,116673,512,41993,13,50.0,False[m
+[32m+[m[32mBrad Allen,East Aaronmouth,59871,781,20087,2,65.0,True[m
+[32m+[m[32mMichael Warner,Jonesbury,131327,570,41963,37,50.0,False[m
+[32m+[m[32mTaylor Coleman,Lake Edward,67930,572,10321,4,35.0,False[m
+[32m+[m[32mRicky Larson,Scottmouth,40458,611,46857,25,40.0,False[m
+[32m+[m[32mKathryn Snyder,New Billchester,142108,630,40564,16,65.0,True[m
+[32m+[m[32mDarryl Craig,Port Emilyview,60512,341,12481,30,45.0,False[m
+[32m+[m[32mJessica Ramirez,Waltersfort,143571,393,31802,22,55.0,False[m
+[32m+[m[32mFrank Garcia,West Robert,43238,807,19888,25,65.0,True[m
+[32m+[m[32mKrista Gibson,Johnnyville,79823,713,34724,0,50.0,False[m
+[32m+[m[32mKimberly Gutierrez,New Michael,66434,810,41986,28,75.0,True[m
+[32m+[m[32mChristina Dunn,Samuelfort,89429,424,2891,40,55.0,False[m
+[32m+[m[32mCynthia Moore,New Rickybury,113320,416,31241,7,45.0,False[m
+[32m+[m[32mBrittany Cantu,Williamview,139328,725,32621,30,80.0,True[m
+[32m+[m[32mJuan Reyes,Port Chad,77819,724,23274,32,70.0,True[m
+[32m+[m[32mAaron Barber,Grimesmouth,51319,795,23618,21,70.0,True[m
+[32m+[m[32mKimberly Gibson,Mollybury,78520,692,16306,26,75.0,True[m
+[32m+[m[32mPatrick Thornton,Hughesberg,76566,807,3426,8,90.0,True[m
+[32m+[m[32mLeslie Kane,Garciamouth,57460,315,48346,9,30.0,False[m
+[32m+[m[32mMatthew Moore,Harringtonview,117841,646,41845,25,65.0,True[m
+[32m+[m[32mSarah Phelps,Finleyfort,64993,336,41465,4,25.0,False[m
+[32m+[m[32mMichael Mitchell,Lake Christopher,121988,400,42533,6,45.0,False[m
+[32m+[m[32mMichael Berger,West Lauraport,119593,667,25565,27,70.0,True[m
+[32m+[m[32mJoseph Knight,East Gregory,114939,691,41613,15,75.0,True[m
+[32m+[m[32mMr. David Little MD,Port Stevenport,39358,461,5840,28,35.0,False[m
+[32m+[m[32mVictoria Evans,Vaughnmouth,109840,609,14055,24,70.0,True[m
+[32m+[m[32mAshley James,Baileyport,113227,322,44137,25,50.0,False[m
+[32m+[m[32mKeith Jennings,New Julieport,52431,535,40784,22,35.0,False[m
+[32m+[m[32mConnor King,Lake Colton,100010,340,21246,28,55.0,False[m
+[32m+[m[32mJacob Anderson,Markchester,125568,479,14159,8,50.0,False[m
+[32m+[m[32mSherri Diaz,Mariaview,62087,793,20342,21,75.0,True[m
+[32m+[m[32mJulie Jones,Port Erica,51417,706,37524,23,60.0,True[m
+[32m+[m[32mJames Baker,South Miguelview,90589,690,42847,23,65.0,True[m
+[32m+[m[32mDavid Johnson,Rosebury,79735,364,42641,29,40.0,False[m
+[32m+[m[32mElizabeth Ortiz,North Sophia,65382,611,33284,7,45.0,False[m
+[32m+[m[32mStephen Taylor,Watsonside,113886,729,39491,9,70.0,True[m
+[32m+[m[32mMary Bass,Crosbyview,120198,333,46238,23,50.0,False[m
+[32m+[m[32mJeremy Young,Corystad,103000,667,4968,25,75.0,True[m
+[32m+[m[32mWalter Rush,Davisborough,58785,321,4314,21,50.0,False[m
+[32m+[m[32mCameron Cunningham,Port Kathyborough,119733,521,16269,21,55.0,False[m
+[32m+[m[32mRachel Carlson,Micheleberg,72504,433,36403,16,35.0,False[m
+[32m+[m[32mAshley Delacruz,North Michael,140474,543,39591,20,50.0,False[m
+[32m+[m[32mDerek Martinez,Foxland,130704,787,30378,23,90.0,True[m
+[32m+[m[32mAshley Gordon,Lake Kristahaven,131711,608,31018,1,55.0,False[m
+[32m+[m[32mJohn Morales,South Jennifermouth,37331,375,6294,20,35.0,False[m
+[32m+[m[32mAna Hill,Oscarhaven,60021,601,30734,32,50.0,False[m
+[32m+[m[32mAnnette Miles,South Shannon,137715,533,28119,21,55.0,False[m
+[32m+[m[32mJennifer Blair,Ronaldview,34207,683,11003,30,55.0,False[m
+[32m+[m[32mRonald Davis,Lake Joanneberg,135518,361,39434,35,50.0,False[m
+[32m+[m[32mMeagan Jenkins,Parrishton,71347,594,40348,19,50.0,False[m
+[32m+[m[32mKenneth Lewis,Walkerville,82581,658,37455,23,55.0,False[m
+[32m+[m[32mDonald Perez,Bruceside,65093,326,40911,17,35.0,False[m
+[32m+[m[32mDonald Farmer,Michaelburgh,38675,446,38114,25,25.0,False[m
+[32m+[m[32mPatrick Bonilla,Lake Alyssafurt,57653,729,30730,21,60.0,True[m
+[32m+[m[32mEric Nguyen,North Ericton,149686,383,18832,28,55.0,False[m
+[32m+[m[32mKarla Ramos,Jasonhaven,104341,416,23621,27,55.0,False[m
+[32m+[m[32mMichael Watkins,Brandonfurt,144867,356,1503,13,60.0,True[m
+[32m+[m[32mDaniel Taylor,Keithville,124098,307,33596,27,50.0,False[m
+[32m+[m[32mJames Padilla,Charleston,71245,746,2228,29,85.0,True[m
+[32m+[m[32mShannon Johnston,Mckinneychester,57869,596,8548,25,60.0,True[m
+[32m+[m[32mFrederick Solis,Collierstad,115909,390,29620,6,45.0,False[m
+[32m+[m[32mKevin Warren,Harrellmouth,95435,526,22827,10,50.0,False[m
+[32m+[m[32mMark Schmidt,Port Michael,81856,451,16484,6,45.0,False[m
+[32m+[m[32mCraig Morrison,East Stephaniefort,145957,775,37944,37,85.0,True[m
+[32m+[m[32mThomas Cunningham,Michellemouth,149871,454,29820,4,45.0,False[m
+[32m+[m[32mMark Hogan,West Williamport,114259,772,30616,2,75.0,True[m
+[32m+[m[32mRonald Jones,New Brookefurt,90142,773,39032,35,75.0,True[m
+[32m+[m[32mNancy Williams,West Cassidy,48726,813,10886,3,65.0,True[m
+[32m+[m[32mRobert Monroe,New Debbieton,64718,553,47374,28,35.0,False[m
+[32m+[m[32mKelly Bishop MD,Paulmouth,48301,353,42345,21,25.0,False[m
+[32m+[m[32mBrandon Gregory,Johnathanberg,62325,641,6341,37,60.0,True[m
+[32m+[m[32mSydney Collins,Andersonland,127647,617,37629,24,65.0,True[m
+[32m+[m[32mErin Anderson,Lake Ellenhaven,103579,670,2194,23,85.0,True[m
+[32m+[m[32mTrevor Peterson,Leeberg,100644,458,6057,18,60.0,True[m
+[32m+[m[32mAshley Wise,Lake Matthewberg,64438,685,11109,10,70.0,True[m
+[32m+[m[32mMichael Weber,Lake Samuel,127912,720,24874,15,80.0,True[m
+[32m+[m[32mLisa Goodwin,Youngbury,106622,616,31737,12,65.0,True[m
+[32m+[m[32mTravis Joyce,Hammondfurt,86155,814,35567,26,80.0,True[m
+[32m+[m[32mRuth Solis,Port John,147679,792,25327,35,90.0,True[m
+[32m+[m[32mMichelle Black,West Christopherburgh,106484,579,30446,32,50.0,False[m
+[32m+[m[32mJeffrey Potts,Port Shannon,82350,657,2747,26,70.0,True[m
+[32m+[m[32mJonathan Young,West Jeffreymouth,77447,401,47838,21,40.0,False[m
+[32m+[m[32mBrenda Mitchell,Hortonberg,58746,780,30399,39,70.0,True[m
+[32m+[m[32mBobby Scott,New Shelby,48131,840,28738,7,60.0,True[m
+[32m+[m[32mCynthia Martinez,South Danielle,96784,768,5116,7,85.0,True[m
+[32m+[m[32mKathryn Herrera,Lake Douglas,94686,739,1102,39,80.0,True[m
+[32m+[m[32mKenneth Lopez,New Theresaland,41915,838,36656,32,65.0,True[m
+[32m+[m[32mKatie Smith,Williamsfurt,129061,682,17623,1,65.0,True[m
+[32m+[m[32mAustin Allen,Port Bonniemouth,36175,436,3905,22,35.0,False[m
+[32m+[m[32mRobin Thompson,Pollardfort,142866,486,9837,4,50.0,False[m
+[32m+[m[32mTerri Johnson,North Kylie,44371,342,21682,19,25.0,False[m
+[32m+[m[32mVirginia Daniels,Benjaminborough,50033,592,24394,3,40.0,False[m
+[32m+[m[32mEvelyn Martinez,Samuelfurt,112240,750,26339,21,90.0,True[m
+[32m+[m[32mKathleen Jimenez,Lauriechester,50969,380,29220,38,35.0,False[m
+[32m+[m[32mCatherine Carter MD,Donnaport,13381

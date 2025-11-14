@@ -1,0 +1,4 @@
+city_encoded,loan_amount,credit_score,years_employed,prediction,timestamp
+326,20000,700,5,True,2025-11-12T20:52:25.034578
+326,30000,700,5,True,2025-11-12T20:53:04.934147
+989,30000,700,5,True,2025-11-12T20:53:15.110364

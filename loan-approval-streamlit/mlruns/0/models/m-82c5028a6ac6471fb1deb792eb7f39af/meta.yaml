@@ -1,0 +1,11 @@
+artifact_location: file:///D:/data%20scinece%20master/EDA4/loan-approval-streamlit/mlruns/0/models/m-82c5028a6ac6471fb1deb792eb7f39af/artifacts
+creation_timestamp: 1762957798680
+experiment_id: '0'
+last_updated_timestamp: 1762957798680
+lifecycle_stage: active
+model_id: m-82c5028a6ac6471fb1deb792eb7f39af
+model_type: null
+name: model
+source_run_id: d0cc81688fe34e19b471993d19bec013
+status: 1
+status_message: null

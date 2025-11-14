@@ -1,0 +1,22 @@
+artifact_path: file:///D:/data%20scinece%20master/EDA4/loan-approval-streamlit/mlruns/0/models/m-6be26f2368984a11841465ab9ab728b9/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+mlflow_version: 3.4.0
+model_id: m-6be26f2368984a11841465ab9ab728b9
+model_size_bytes: 2174284
+model_uuid: m-6be26f2368984a11841465ab9ab728b9
+prompts: null
+run_id: 7e2e5240683e48e8a2d1c809fb754a19
+utc_time_created: '2025-11-12 13:57:08.025826'

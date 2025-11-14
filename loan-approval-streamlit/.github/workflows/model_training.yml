@@ -1,0 +1,29 @@
+name: CI/CD Model Training
+
+on: [push]
+
+jobs:
+  train-and-register:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run training and register model
+        run: python retrain_and_register.py
+
+      - name: (Optional) Test training script
+        run: python test_training_script.py
+
+      - name: Notify or deploy
+        # Add Slack notification, MLOps deployment script, or other CI/CD tasks
+        run: echo "Training and model registration completed."
