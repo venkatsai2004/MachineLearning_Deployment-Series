@@ -1,0 +1,22 @@
+artifact_path: file:///D:/data%20scinece%20master/EDA3/mlruns/0/models/m-dfcc5bbbabb4473b99f9819e12ff7d63/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+mlflow_version: 3.4.0
+model_id: m-dfcc5bbbabb4473b99f9819e12ff7d63
+model_size_bytes: 37635
+model_uuid: m-dfcc5bbbabb4473b99f9819e12ff7d63
+prompts: null
+run_id: bfe0ee2548a94460982864c6373fad5a
+utc_time_created: '2025-11-14 14:53:01.514433'

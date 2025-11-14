@@ -1,0 +1,10 @@
+artifact_location: file:///D:/data%20scinece%20master/EDA3/mlruns/0/models/m-dfcc5bbbabb4473b99f9819e12ff7d63/artifacts
+creation_timestamp: 1763131981441
+experiment_id: '0'
+last_updated_timestamp: 1763131988236
+model_id: m-dfcc5bbbabb4473b99f9819e12ff7d63
+model_type: null
+name: model
+source_run_id: bfe0ee2548a94460982864c6373fad5a
+status: 2
+status_message: null

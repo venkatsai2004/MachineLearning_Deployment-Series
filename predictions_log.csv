@@ -1,0 +1,7 @@
+Age,Gender,Smoking,Hx Smoking,Hx Radiothreapy,Physical Examination,Adenopathy,Pathology,Focality,Risk,T,N,M,Stage,Response,prediction,timestamp
+50,F,No,No,No,Normal,No,Papillary,Uni-Focal,Low,T1a,N0,M0,I,Excellent,0,2025-11-14T19:37:35.909972
+50,F,No,No,No,Normal,No,Papillary,Uni-Focal,Low,T1a,N0,M0,I,Excellent,0,2025-11-14T19:37:43.022324
+50,M,No,No,No,Normal,No,Papillary,Uni-Focal,Low,T1a,N0,M0,I,Excellent,0,2025-11-14T19:37:59.884373
+50,F,No,No,No,Normal,No,Papillary,Uni-Focal,Low,T1a,N0,M0,I,Excellent,0,2025-11-14T19:38:32.701965
+50,F,No,No,No,Normal,No,Papillary,Multi-Focal,Low,T1a,N0,M0,I,Biochemical Incomplete,0,2025-11-14T19:38:42.036741
+50,F,No,No,No,Normal,No,Papillary,Uni-Focal,Low,T1a,N0,M0,I,Excellent,0,2025-11-14T20:26:43.095264

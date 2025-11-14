@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/data%20scinece%20master/EDA3/mlruns/0/7ac5728a966748f3a816c558b9fd8618/artifacts
+end_time: 1763131933385
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 7ac5728a966748f3a816c558b9fd8618
+run_name: efficient-bug-296
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1763131916178
+status: 4
+tags: []
+user_id: venka
